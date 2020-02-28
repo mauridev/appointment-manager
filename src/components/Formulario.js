@@ -1,6 +1,8 @@
 import React, { Fragment, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import PropTypes from "prop-types";
 
-const Formulario = () => {
+const Formulario = ({ crearCita }) => {
   //Crear State de appointment
   const [appointment, updateAppointment] = useState({
     pet: "",
@@ -9,6 +11,7 @@ const Formulario = () => {
     time: "",
     symptoms: ""
   });
+  const [error, actualizarError] = useState(false);
 
   //Funcion que se ejecuta cada vez que el usuairo escribe en un input
   const updateState = e => {
@@ -24,20 +27,42 @@ const Formulario = () => {
   //cuando el usuario presiona el boton del formulario
   const submitAppointment = e => {
     e.preventDefault();
-    console.log("enviando form");
 
     //validar
+    if (
+      pet.trim() === "" ||
+      owner.trim() === "" ||
+      date.trim() === "" ||
+      time.trim() === "" ||
+      symptoms.trim() === ""
+    ) {
+      actualizarError(true);
+      return;
+    }
+
+    //eliminar mensaje de error
+    actualizarError(false);
 
     //asignar un ID
-
+    appointment.id = uuidv4();
     //Crear la cita
-
+    crearCita(appointment);
     //Reiniciar el form
+    updateAppointment({
+      pet: "",
+      owner: "",
+      date: "",
+      time: "",
+      symptoms: ""
+    });
   };
 
   return (
     <Fragment>
       <h2>Add new appointment</h2>
+      {error ? (
+        <p className="alerta-error">Todos los campos son obligatiors</p>
+      ) : null}
       <form onSubmit={submitAppointment}>
         <label>Pet Name</label>
         <input
@@ -88,4 +113,7 @@ const Formulario = () => {
   );
 };
 
+Formulario.propTypes = {
+  crearCita: PropTypes.func.isRequired
+};
 export default Formulario;
